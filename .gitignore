@@ -1,0 +1,53 @@
+## Ignore build results
+bin/
+obj/
+out/
+
+## Ignore Rider IDE files
+.idea/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+## Ignore dotnet secrets directory
+secrets/
+
+## ASP.NET Core static files and logs
+wwwroot/
+*.db
+*.log
+
+## Ignore user-specific files
+*.vspscc
+*.vssscc
+
+## Visual Studio Code settings
+.vscode/
+
+## Package directories
+node_modules/
+bower_components/
+
+## Other generated files
+*.cache
+*.config
+*.pid
+*.tmp
+
+## Publish directory
+publish/
+*.Publish.xml
+
+## Environment files
+.env
+.env.*
+
+## Logs
+logs/
+*.log
