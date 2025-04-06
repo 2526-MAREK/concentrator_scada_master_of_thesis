@@ -42,7 +42,16 @@ namespace PressureSensorProducer
         _bucket);
 
     // Create the InfluxDB client once
-    _influxClient = InfluxDBClientFactory.Create(influxUrl, token);
+    var options = new InfluxDBClientOptions(influxUrl)
+{
+    Token = token,
+    Org = _org,
+    Bucket = _bucket,
+    Timeout = TimeSpan.FromSeconds(30)
+};
+_logger.LogInformation("Creating InfluxDB client with options: URL={Url}, Org={Org}, Bucket={Bucket}", 
+    options.Url, options.Org, options.Bucket);
+_influxClient = InfluxDBClientFactory.Create(options);
 
     // Create the WriteApiAsync once
     _writeApi = _influxClient.GetWriteApiAsync();
