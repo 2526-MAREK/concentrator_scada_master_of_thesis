@@ -11,4 +11,4 @@ datasources:
       defaultBucket: pressure-data
       tlsSkipVerify: true
     secureJsonData:
-      token: my-token
+      token: L1IXNeWwJ8V6_cY2B08onCntT84JlrRtlj-GiDkkhpU3av5QiIxPr25ljOAnje1SoXIDlCoear6s4BLu8g8R2A==

@@ -23,24 +23,30 @@ namespace PressureSensorProducer
         private string _org;
         private readonly IWriteApiAsync _writeApi;
 
-        public TcpListenerService(ILogger<TcpListenerService> logger, IConfiguration configuration)
-        {
-            _logger = logger;
-            _configuration = configuration;
+	public TcpListenerService(ILogger<TcpListenerService> logger, IConfiguration configuration)
+{
+    _logger = logger;
+    _configuration = configuration;
 
-            // Read from config
-            var influxUrl = _configuration["InfluxDB:Url"];
-            var token = _configuration["InfluxDB:Token"];
-            _org = _configuration["InfluxDB:Org"];
-            _bucket = _configuration["InfluxDB:Bucket"];
+    // Read from config
+    var influxUrl = _configuration["InfluxDB:Url"];
+    var token = _configuration["InfluxDB:Token"];
+    _org = _configuration["InfluxDB:Org"];
+    _bucket = _configuration["InfluxDB:Bucket"];
 
-            // Create the InfluxDB client once
-            _influxClient = InfluxDBClientFactory.Create(influxUrl, token);
+    // Add this debug logging here
+    _logger.LogInformation("Using InfluxDB URL: {Url}, Token: {TokenPart}, Org: {Org}, Bucket: {Bucket}", 
+        influxUrl, 
+        token?.Length > 10 ? token.Substring(0, 10) + "..." : "null", 
+        _org, 
+        _bucket);
 
-            // Create the WriteApiAsync once
-            _writeApi = _influxClient.GetWriteApiAsync();
-        }
+    // Create the InfluxDB client once
+    _influxClient = InfluxDBClientFactory.Create(influxUrl, token);
 
+    // Create the WriteApiAsync once
+    _writeApi = _influxClient.GetWriteApiAsync();
+}	
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             // Listen on TCP port 5000.
