@@ -26,7 +26,7 @@ services:
       - DOCKER_INFLUXDB_INIT_PASSWORD=admin123
       - DOCKER_INFLUXDB_INIT_ORG=my-org
       - DOCKER_INFLUXDB_INIT_BUCKET=pressure-data
-      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-token
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=L1IXNeWwJ8V6_cY2B08onCntT84JlrRtlj-GiDkkhpU3av5QiIxPr25ljOAnje1SoXIDlCoear6s4BLu8g8R2A==
     volumes:
       - influxdb-data:/var/lib/influxdb2
     networks:
@@ -95,7 +95,7 @@ services:
     restart: unless-stopped
     environment:
       - InfluxDB__Url=http://influxdb:8086
-      - InfluxDB__Token=my-token
+      - InfluxDB__Token=L1IXNeWwJ8V6_cY2B08onCntT84JlrRtlj-GiDkkhpU3av5QiIxPr25ljOAnje1SoXIDlCoear6s4BLu8g8R2A==
       - InfluxDB__Org=my-org
       - InfluxDB__Bucket=pressure-data
     networks:
