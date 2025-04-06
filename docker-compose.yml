@@ -1,0 +1,118 @@
+version: '3.8'
+services:
+  # Redis service
+  redis:
+    image: redis:7.0-alpine
+    container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - pressure-network
+
+  # InfluxDB service
+  influxdb:
+    image: influxdb:2.6
+    container_name: influxdb
+    restart: unless-stopped
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=admin123
+      - DOCKER_INFLUXDB_INIT_ORG=my-org
+      - DOCKER_INFLUXDB_INIT_BUCKET=pressure-data
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=my-token
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+    networks:
+      - pressure-network
+
+  # Grafana service
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
+      - ./infra/grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - pressure-network
+    depends_on:
+      - influxdb
+
+  # Publisher service
+  publisher:
+    build:
+      context: ./Publisher
+      dockerfile: Dockerfile
+    container_name: publisher
+    restart: unless-stopped
+    environment:
+      - REDIS_CONNECTION=redis:6379
+    ports:
+      - "8095:8095"
+    networks:
+      - pressure-network
+    depends_on:
+      - redis
+
+  # Subscriber service
+  subscriber:
+    build:
+      context: ./Subscriber
+      dockerfile: Dockerfile
+    container_name: subscriber
+    restart: unless-stopped
+    environment:
+      - REDIS_CONNECTION=redis:6379
+      - PRESSURE_SERVICE_HOST=pressure-producer
+      - PRESSURE_SERVICE_PORT=5000
+    networks:
+      - pressure-network
+    depends_on:
+      - redis
+      - publisher
+      - pressure-producer
+
+  # Pressure Sensor Producer service
+  pressure-producer:
+    build:
+      context: ./PressureSensorProducer
+      dockerfile: Dockerfile
+    container_name: pressure-producer
+    restart: unless-stopped
+    environment:
+      - InfluxDB__Url=http://influxdb:8086
+      - InfluxDB__Token=my-token
+      - InfluxDB__Org=my-org
+      - InfluxDB__Bucket=pressure-data
+    networks:
+      - pressure-network
+    depends_on:
+      - influxdb
+
+# Define a custom network for the services
+networks:
+  pressure-network:
+    driver: bridge
+
+# Define volumes for data persistence
+volumes:
+  redis-data:
+    driver: local
+  influxdb-data:
+    driver: local
+  grafana-data:
+    driver: local
